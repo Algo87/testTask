@@ -126,8 +126,8 @@ export class Popup {
     const popupNodes = this.$popup.querySelectorAll(_focusElements);
 
     const iframe = document.querySelector("#player");
-    var iframeDoc = iframe.contentWindow.document;
-    console.log(iframeDoc);
+    // var iframeDoc = iframe.contentWindow.document;
+    console.log(iframe);
 
     // if (iframeDoc.readyState == "complete") {
     //   console.log(iframeDoc);
@@ -143,6 +143,14 @@ export class Popup {
     //   console.log(iframeDoc2.querySelectorAll(_focusElements));
     // };
 
+    var listener = addEventListener("blur", function () {
+      if (document.activeElement === document.getElementById("player")) {
+        console.log("sldkjfslkjflskjflksjlfkdjskdfjsldjkf");
+      }
+      // removeEventListener("blur", listener);
+    });
+
+    console.log(document.activeElement);
     const firstTabStop = popupNodes[0];
     const lastTabStop = popupNodes[popupNodes.length - 1];
     firstTabStop.focus();

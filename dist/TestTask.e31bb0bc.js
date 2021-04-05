@@ -216,9 +216,9 @@ var Popup = /*#__PURE__*/function () {
     value: // TABPRESScONTROL
     function tabPressControl(event) {
       var popupNodes = this.$popup.querySelectorAll(_focusElements);
-      var iframe = document.querySelector("#player");
-      var iframeDoc = iframe.contentWindow.document;
-      console.log(iframeDoc); // if (iframeDoc.readyState == "complete") {
+      var iframe = document.querySelector("#player"); // var iframeDoc = iframe.contentWindow.document;
+
+      console.log(iframe); // if (iframeDoc.readyState == "complete") {
       //   console.log(iframeDoc);
       // }
       // iframe.onload = function () {
@@ -231,6 +231,13 @@ var Popup = /*#__PURE__*/function () {
       //   console.log(iframeDoc2.querySelectorAll(_focusElements));
       // };
 
+      var listener = addEventListener("blur", function () {
+        if (document.activeElement === document.getElementById("player")) {
+          console.log("sldkjfslkjflskjflksjlfkdjskdfjsldjkf");
+        } // removeEventListener("blur", listener);
+
+      });
+      console.log(document.activeElement);
       var firstTabStop = popupNodes[0];
       var lastTabStop = popupNodes[popupNodes.length - 1];
       firstTabStop.focus();
