@@ -41,10 +41,8 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  background-image: url("/close-icon.f70d4c43.svg");
+  background-image: url("../img/close-icon.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 16px 16px;
 }
-
-/*# sourceMappingURL=/TestTask.e31bb0bc.css.map */

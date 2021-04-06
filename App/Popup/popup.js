@@ -49,7 +49,13 @@ const _focusElements = [
   '[tabindex]:not([tabindex^="-"])',
 ];
 
-export class Popup {
+const tag = document.createElement("script");
+tag.setAttribute("src", "https://www.youtube.com/iframe_api");
+document
+  .getElementsByTagName("script")[0]
+  .insertAdjacentElement("beforebegin", tag);
+
+class Popup {
   constructor(selector, options) {
     this.init(selector, options);
   }
@@ -121,49 +127,42 @@ export class Popup {
       // console.log("this.player", this.player);
     });
   }
-  // TABPRESScONTROL
-  tabPressControl(event) {
-    const popupNodes = this.$popup.querySelectorAll(_focusElements);
 
-    const iframe = document.querySelector("#player");
-    // var iframeDoc = iframe.contentWindow.document;
-    console.log(iframe);
-
-    // if (iframeDoc.readyState == "complete") {
-    //   console.log(iframeDoc);
-    // }
-    // iframe.onload = function () {
-    //   var iframeDoc2 = iframe.contentWindow.document;
-    //   console.log(iframeDoc2);
-    // };
-
-    // console.log(iframe);
-    // iframe.onload = function () {
-    //   var iframeDoc2 = iframe.contentWindow.document;
-    //   console.log(iframeDoc2.querySelectorAll(_focusElements));
-    // };
-
-    var listener = addEventListener("blur", function () {
+  #checkIframeFocus() {
+    return addEventListener("focusout", function () {
       if (document.activeElement === document.getElementById("player")) {
         console.log("sldkjfslkjflskjflksjlfkdjskdfjsldjkf");
       }
       // removeEventListener("blur", listener);
     });
+  }
+  // TABPRESScONTROL
+  tabPressControl(event) {
+    console.log(this.player.getIframe());
+    
+    const popupNodes = this.$popup.querySelectorAll(_focusElements);
+    this.#checkIframeFocus();
+    const iframe = document.querySelector("#player");
+    // var iframeDoc = iframe.contentWindow.document;
+    // console.log(iframe);
 
-    console.log(document.activeElement);
+    // console.log(document.activeElement);
     const firstTabStop = popupNodes[0];
     const lastTabStop = popupNodes[popupNodes.length - 1];
     firstTabStop.focus();
 
     this.lastFocusedElement = document.activeElement;
+
     if (event.keyCode === 9) {
+      // console.log(lastTabStop === iframe);
       if (event.shiftKey) {
         if (document.activeElement === firstTabStop) {
           event.preventDefault();
           lastTabStop.focus();
         }
       } else {
-        if (document.activeElement === lastTabStop) {
+        console.log(lastTabStop === iframe);
+        if (document.activeElement === lastTabStop || lastTabStop === iframe) {
           event.preventDefault();
           firstTabStop.focus();
         }
@@ -213,5 +212,6 @@ export class Popup {
     typeof this.options.onDestroy === "function" && this.options.onDestroy();
     this.$popup.removeEventListener("click", this.closeListener);
     this.$popup.removeEventListener("keydown", this.tabPressControl);
+    removeEventListener("blur", this.#checkIframeFocus());
   }
 }

@@ -1,9 +1,3 @@
-import { Popup } from "./Popup/popup";
-import "./Popup/style.scss";
-import maidBg from "./img/main_bg.png";
-import btnImg from "./img/btn_img.svg";
-const img = new Array(maidBg, btnImg);
-
 const modal = new Popup("#play", {
   videoId: "MB80ZuIJATI",
   onOpen() {
@@ -26,10 +20,6 @@ var lazy = [];
 
 function setLazy() {
   lazy = document.querySelectorAll("[data-lazy]");
-  lazy.forEach((l, i) => {
-    l.setAttribute("data-src", img[i]);
-  });
-  console.log("Found " + lazy.length + " lazy images");
 }
 
 function lazyLoad() {
