@@ -25,6 +25,11 @@
   position: relative;
   max-height: 80%;
 }
+.popup__text-container {
+  background: #fff;
+  padding: 24px;
+  margin-top: 16px;
+}
 .popup__video {
   position: absolute;
   top: 0;

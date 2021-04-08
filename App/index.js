@@ -1,8 +1,13 @@
 const modal = new Popup("#play", {
   videoId: "MB80ZuIJATI",
-
-  textTemplate: "",
+  // textTemplate:`
+  //   <label for='1'>skjfskj1</label><input type='text' id='1' />
+  //   <label for='2'>skjfskj2</label><input type='checkbox' id='2' />
+  //   <label for='3'>skjfskj3</label><input type='checkbox' id='3' />
+  //   <label for='4'>skjfskj4</label><input type='text' id='4' />
+  // `,
   type: "video",
+  // type: "text",
   onOpen() {
     console.log("onOpen");
   },

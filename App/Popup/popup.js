@@ -20,18 +20,6 @@ class Popup {
   }
 
   init(selector, options) {
-    this.#createTag();
-    this.screenHeight = window.innerHeight;
-    this.screenWidth = window.innerWidth;
-
-    this.player;
-
-    this.options = options;
-    this.type = this.options.type || "text";
-    this.$play = document.querySelector(selector);
-    this.$popupTextInner = options.textTemplate || "Default text";
-    this.$popup = this.getTemplate();
-
     this.open = this.open.bind(this);
     this.close = this.close.bind(this);
     this.closeListener = this.closeListener.bind(this);
@@ -42,13 +30,28 @@ class Popup {
     this.changeSizePopup = this.changeSizePopup.bind(this);
     this.onResize = this.onResize.bind(this);
 
+    this.options = options;
+    this.type = this.options.type || "text";
+    this.screenHeight = window.innerHeight;
+    this.screenWidth = window.innerWidth;
+
+    this.$play = document.querySelector(selector);
+    this.$popupTextInner = options.textTemplate || "Default text";
+    this.$popup = this.getTemplate();
+
+    this.#createTagScriptForYoutybePay();
     this.#setup();
     this.onResize();
     this.opened = false;
     this.lastFocusedElement;
+    this.player;
+
+    const popupNodes = this.$popup.querySelectorAll(_focusElements);
+    this.firstTabStop = popupNodes[0];
+    this.lastTabStop = popupNodes[popupNodes.length - 1];
   }
 
-  #createTag() {
+  #createTagScriptForYoutybePay() {
     const tag = document.createElement("script");
     tag.setAttribute("src", "https://www.youtube.com/iframe_api");
     document
@@ -64,9 +67,10 @@ class Popup {
     popup.innerHTML = `
       <div class="popup__bg"></div>
       <div class="popup__inner">
-        ${(this.type = "video"
-          ? `
-              <input style="width:1px; height:1px; opacity:0; padding: 0; margin: 0;" type="checkbox" role="note" />
+        ${
+          this.type === "video"
+            ? `
+            <input style="width:1px; height:1px; opacity:0; padding: 0; margin: 0;" type="checkbox" role="note" />
               <div
                 class="popup__video-container"
                 data-container
@@ -75,7 +79,8 @@ class Popup {
                 <div id="player"></div>
               </div>
             `
-          : `<div class="popup__video-container">${this.$popupTextInner}</div>`)}
+            : `<div class="popup__text-container">${this.$popupTextInner}</div>`
+        }
         <button class="popup__close-btn" data-close="true"></button>
       </div>
     `;
@@ -125,7 +130,6 @@ class Popup {
         height: "100%",
         width: "100%",
         videoId: videoId,
-        origin: "http://localhost:1234",
       });
     });
   }
@@ -136,28 +140,22 @@ class Popup {
 
   #setup() {
     this.$play.addEventListener("click", this.open);
-    this.$play.addEventListener("keydown", this.open);
     this.$popup.addEventListener("click", this.closeListener);
     this.$popup.addEventListener("keydown", this.closeListener);
+    this.$popup.addEventListener("keydown", this.tabPressControl);
   }
 
   tabPressControl(event) {
     if (event.keyCode === 9) {
-      const popupNodes = this.$popup.querySelectorAll(_focusElements);
-      const firstTabStop = popupNodes[0];
-      const lastTabStop = popupNodes[popupNodes.length - 1];
-
-      firstTabStop.focus();
-
       if (event.shiftKey) {
-        if (document.activeElement === firstTabStop) {
+        if (document.activeElement === this.firstTabStop) {
           event.preventDefault();
-          lastTabStop.focus();
+          this.lastTabStop.focus();
         }
       } else {
-        if (document.activeElement === lastTabStop) {
+        if (document.activeElement === this.lastTabStop) {
           event.preventDefault();
-          firstTabStop.focus();
+          this.firstTabStop.focus();
         }
       }
     }
@@ -166,41 +164,39 @@ class Popup {
   closeListener(event) {
     if (
       (event.type === "click" && event.target.dataset.close) ||
-      (event.type === "keydown" &&
-        event.target.dataset.close &&
-        event.keyCode === 13) ||
       (event.type === "keydown" && this.opened && event.keyCode === 27)
     ) {
       this.close();
-      // this.lastFocusedElemen && this.lastFocusedElemen.focus();
     }
   }
 
   open(event) {
     if (
-      event.type === "click" ||
+      (event.type === "click" && !this.opened) ||
       (event.type === "keydown" && event.keyCode === "13" && !this.opened)
     ) {
       this.lastFocusedElement = document.activeElement;
-      this.opened = true;
+      this.firstTabStop.focus();
       this.#render();
       this.$popup.classList.add("open");
-      this.startPlayer(this.options.videoId);
+      this.type === "video" && this.startPlayer(this.options.videoId);
       typeof this.options.onOpen === "function" && this.options.onOpen();
-      this.$popup.addEventListener("keydown", this.tabPressControl);
+      this.opened = true;
     }
   }
 
   close() {
-    this.opened = false;
+    this.lastFocusedElement && this.lastFocusedElement.focus();
     typeof this.options.onClose === "function" && this.options.onClose();
     this.$popup.classList.remove("open");
-    this.player.destroy();
+    this.player && this.player.destroy();
+    this.opened = false;
   }
 
   destroy() {
     typeof this.options.onDestroy === "function" && this.options.onDestroy();
     this.$popup.removeEventListener("click", this.closeListener);
     this.$popup.removeEventListener("keydown", this.tabPressControl);
+    this.$play.removeEventListener("click", this.open);
   }
 }
